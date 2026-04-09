@@ -6,7 +6,7 @@ const firebaseConfig = {
   projectId: "gen-lang-client-0936376865",
   appId: "1:247005664066:web:0cba5ce6c3b8eac0a92edb",
   apiKey: "AIzaSyDTAJI6PAPub_pAK0cvnQqHWrS6HWOVLO0",
-  authDomain: "gen-lang-client-0936376865.firebaseapp.com",
+  authDomain: "assistant-app-agformalcontact-ux.vercel.app",
   firestoreDatabaseId: "ai-studio-811baf61-c25d-45d3-b1d0-693cd88c51a6",
   storageBucket: "gen-lang-client-0936376865.firebasestorage.app",
   messagingSenderId: "247005664066",
@@ -17,6 +17,8 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
 
 export enum OperationType {
   CREATE = 'create',
