@@ -1,13 +1,4 @@
 {
-  "functions": {
-    "api/gemini.js": {}
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
