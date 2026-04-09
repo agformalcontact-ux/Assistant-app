@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
     const ai = new GoogleGenerativeAI(apiKey);
     const model = ai.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-1.5-flash',
       systemInstruction: systemInstruction || undefined
     });
 
