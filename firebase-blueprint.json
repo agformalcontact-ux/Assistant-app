@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user preferences and basic info.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string", "description": "User's display name" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "voice": { "type": "string" },
+            "theme": { "type": "string" },
+            "personality": { "type": "string" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid"]
+    },
+    "Fact": {
+      "title": "User Fact",
+      "description": "A specific fact Nova has learned about the user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner UID" },
+        "content": { "type": "string", "description": "The fact text" },
+        "isShared": { "type": "boolean", "description": "Whether this fact is shared with the family/team" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
+    "/users/{userId}/facts/{factId}": {
+      "schema": "Fact",
+      "description": "Collection of facts learned about the user"
+    }
+  }
+}

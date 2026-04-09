@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId} (Auth UID)
+    // Fields:
+    //   - uid: string (required) - Firebase Auth UID
+    //   - name: string (optional) - User's display name
+    //   - preferences: map (optional) - User settings
+    //   - createdAt: timestamp (optional) - Creation time
+    //
+    // Collection: users/{userId}/facts
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - Owner UID
+    //   - content: string (required) - The fact text (max 500 chars)
+    //   - timestamp: timestamp (required) - When learned
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid']) &&
+             data.uid is string && data.uid == request.auth.uid &&
+             (!('name' in data) || (data.name is string && data.name.size() < 100)) &&
+             (!('preferences' in data) || data.preferences is map);
+    }
+
+    function isValidFact(data) {
+      return data.keys().hasAll(['userId', 'content', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.content is string && data.content.size() > 0 && data.content.size() <= 500 &&
+             data.timestamp is timestamp;
+    }
+
+    function isValidVisualMemory(data) {
+      return data.keys().hasAll(['description', 'timestamp']) &&
+             data.description is string && data.description.size() > 0 && data.description.size() <= 1000 &&
+             data.timestamp is timestamp;
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['amount', 'merchant', 'timestamp']) &&
+             data.amount is number &&
+             data.merchant is string && data.merchant.size() > 0 && data.merchant.size() <= 200 &&
+             (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+             data.timestamp is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      
+      match /facts/{factId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidFact(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /visual_memories/{memId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidVisualMemory(request.resource.data);
+      }
+
+      match /expenses/{expenseId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidExpense(request.resource.data);
+      }
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

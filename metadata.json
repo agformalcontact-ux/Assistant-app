@@ -1,0 +1,5 @@
+{
+  "name": "Nova Assistant",
+  "description": "A persistent, voice-activated AI assistant for your phone that can interact with apps and execute tasks.",
+  "requestFramePermissions": ["microphone", "camera", "geolocation", "screen-wake-lock"]
+}
