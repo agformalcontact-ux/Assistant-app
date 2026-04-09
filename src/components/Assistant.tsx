@@ -104,7 +104,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-export const Assistant = () => {
+const Assistant = () => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [facts, setFacts] = useState<string[]>([]);
@@ -1321,3 +1321,5 @@ export const Assistant = () => {
     </div>
   );
 };
+
+export default Assistant;
