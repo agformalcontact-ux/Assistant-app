@@ -1,7 +1,17 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, User as FirebaseUser } from 'firebase/auth';
 import { getFirestore, doc, collection, onSnapshot, setDoc, addDoc, query, orderBy, getDocFromServer } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+
+const firebaseConfig = {
+  projectId: "gen-lang-client-0936376865",
+  appId: "1:247005664066:web:0cba5ce6c3b8eac0a92edb",
+  apiKey: "AIzaSyDTAJI6PAPub_pAK0cvnQqHWrS6HWOVLO0",
+  authDomain: "gen-lang-client-0936376865.firebaseapp.com",
+  firestoreDatabaseId: "ai-studio-811baf61-c25d-45d3-b1d0-693cd88c51a6",
+  storageBucket: "gen-lang-client-0936376865.firebasestorage.app",
+  messagingSenderId: "247005664066",
+  measurementId: ""
+};
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

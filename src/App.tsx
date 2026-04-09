@@ -8,20 +8,17 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   constructor(props: { children: ReactNode }) {
     super(props);
     this.state = { hasError: false };
-    console.log('ErrorBoundary: constructor');
   }
 
   static getDerivedStateFromError(error: Error) {
-    console.error('ErrorBoundary: getDerivedStateFromError', error);
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('ErrorBoundary: componentDidCatch', error, errorInfo);
+    console.error('Error caught by boundary:', error, errorInfo);
   }
 
   render() {
-    console.log('ErrorBoundary: render', this.state);
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 font-sans antialiased">

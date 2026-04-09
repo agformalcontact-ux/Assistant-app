@@ -105,7 +105,6 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export const Assistant = () => {
-  console.log('Assistant: component rendering');
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [facts, setFacts] = useState<string[]>([]);
