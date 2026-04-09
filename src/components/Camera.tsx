@@ -6,9 +6,10 @@ import { Button } from './ui/button';
 interface CameraProps {
   onCapture: (base64: string) => void;
   onClose: () => void;
+  showAR?: boolean;
 }
 
-export const Camera = ({ onCapture, onClose }: CameraProps) => {
+export const Camera = ({ onCapture, onClose, showAR = false }: CameraProps) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [arLabels, setArLabels] = useState<{ x: number, y: number, text: string }[]>([]);
@@ -17,7 +18,7 @@ export const Camera = ({ onCapture, onClose }: CameraProps) => {
 
   // Simulated AR detection
   useEffect(() => {
-    if (isReady) {
+    if (isReady && showAR) {
       const interval = setInterval(() => {
         const labels = [
           { x: 30 + Math.random() * 40, y: 30 + Math.random() * 40, text: "Object Detected" },
@@ -26,8 +27,10 @@ export const Camera = ({ onCapture, onClose }: CameraProps) => {
         setArLabels(labels);
       }, 3000);
       return () => clearInterval(interval);
+    } else {
+      setArLabels([]);
     }
-  }, [isReady]);
+  }, [isReady, showAR]);
 
   const startCamera = useCallback(async () => {
     try {

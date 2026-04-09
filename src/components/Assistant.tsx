@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Brain, Dumbbell, Receipt, Languages, Shield, Edit3, AlertTriangle, MapPin, UserCircle, Mic, MicOff, MessageSquare, Settings, Phone, Bell, Cloud, Music, Send, AppWindow, Volume2, Download, Sparkles, ChevronRight, Camera as CameraIcon, X, Zap, HelpCircle, Menu, History } from 'lucide-react';
+import { Brain, Dumbbell, Receipt, Languages, Shield, Edit3, AlertTriangle, MapPin, Mic, MicOff, MessageSquare, Settings, Bell, Send, Volume2, Download, Sparkles, ChevronRight, Camera as CameraIcon, X, Zap, HelpCircle, Menu, History } from 'lucide-react';
 import { useLiveAssistant } from '@/hooks/useLiveAssistant';
 import { VoiceVisualizer } from './VoiceVisualizer';
 import { Camera } from './Camera';
@@ -20,10 +20,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 
 const VOICES = ['Puck', 'Charon', 'Kore', 'Fenrir', 'Aoede'];
@@ -35,17 +32,90 @@ interface LogEntry {
   category?: string;
 }
 
+interface UserProfile {
+  name?: string;
+  preferences?: {
+    voice?: string;
+    theme?: string;
+    personality?: string;
+    useElevenLabs?: boolean;
+    elevenLabsVoice?: string;
+    visualStyle?: string;
+    focusMode?: boolean;
+    soundscape?: string;
+    showAR?: boolean;
+    selectedModel?: string;
+  };
+  facts?: string[];
+}
+
+interface HealthData {
+  metric: string;
+  value: number;
+  unit: string;
+}
+
+interface ProductivityData {
+  period: string;
+  screenTime: string;
+  topApp: string;
+}
+
+interface InterpreterData {
+  text: string;
+  translation: string;
+  lang: string;
+}
+
+interface GamingData {
+  type: string;
+  status: string;
+}
+
+interface VisualMemory {
+  description: string;
+  timestamp?: Date;
+}
+
+interface Expense {
+  amount: number;
+  merchant: string;
+  category?: string;
+  timestamp?: Date;
+}
+
+interface FitnessData {
+  exercise: string;
+  feedback: string;
+}
+
+interface ExpenseData {
+  amount: number;
+  merchant: string;
+  category?: string;
+}
+
+interface TravelData {
+  landmark: string;
+  info: string;
+}
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export const Assistant = () => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [facts, setFacts] = useState<string[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const chatSessionRef = useRef<any>(null);
+  const chatSessionRef = useRef<any>(null); // Keep as any for now, complex Gemini type
   const [selectedVoice, setSelectedVoice] = useState('Puck');
   const [accent, setAccent] = useState('Standard');
   const [selectedModel, setSelectedModel] = useState('gemini-3.1-flash-live-preview');
   const [personality, setPersonality] = useState('Helpful');
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [batteryLevel, setBatteryLevel] = useState<number | null>(null);
@@ -53,15 +123,15 @@ export const Assistant = () => {
   const [textInput, setTextInput] = useState("");
   const [isTextMode, setIsTextMode] = useState(false);
   const [activeDashboard, setActiveDashboard] = useState<'none' | 'health' | 'productivity' | 'gaming' | 'interpreter' | 'visual_memory' | 'fitness' | 'expense' | 'travel' | 'whiteboard'>('none');
-  const [healthData, setHealthData] = useState<any>(null);
-  const [productivityData, setProductivityData] = useState<any>(null);
-  const [interpreterData, setInterpreterData] = useState<any>(null);
-  const [gamingData, setGamingData] = useState<any>(null);
-  const [visualMemories, setVisualMemories] = useState<any[]>([]);
-  const [expenses, setExpenses] = useState<any[]>([]);
-  const [fitnessData, setFitnessData] = useState<any>(null);
-  const [expenseData, setExpenseData] = useState<any>(null);
-  const [travelData, setTravelData] = useState<any>(null);
+  const [healthData, setHealthData] = useState<HealthData | null>(null);
+  const [productivityData, setProductivityData] = useState<ProductivityData | null>(null);
+  const [interpreterData, setInterpreterData] = useState<InterpreterData | null>(null);
+  const [gamingData, setGamingData] = useState<GamingData | null>(null);
+  const [visualMemories, setVisualMemories] = useState<VisualMemory[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [fitnessData, setFitnessData] = useState<FitnessData | null>(null);
+  const [expenseData, setExpenseData] = useState<ExpenseData | null>(null);
+  const [travelData, setTravelData] = useState<TravelData | null>(null);
   const [whiteboardData, setWhiteboardData] = useState<string[]>([]);
   const [shadowingMode, setShadowingMode] = useState<{ active: boolean, lang: string } | null>(null);
   const [focusMode, setFocusMode] = useState(false);
@@ -73,7 +143,7 @@ export const Assistant = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showAR, setShowAR] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const wakeLockRef = useRef<any>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
   // Voice/Model Reactivity
   useEffect(() => {
@@ -250,7 +320,7 @@ export const Assistant = () => {
     }
   }, [user]);
 
-  const { isActive, isConnecting, error, transcript, volume, isSpeaking, isMuted: liveMuted, setIsMuted: setLiveMuted, start, stop, sendImage } = useLiveAssistant(selectedVoice, accent, facts, selectedModel);
+  const { isActive, isConnecting, error, transcript, volume, isSpeaking, setIsMuted: setLiveMuted, start, stop, sendImage } = useLiveAssistant(selectedVoice, accent, facts, selectedModel);
 
   // Sync mute state
   useEffect(() => {
@@ -402,6 +472,7 @@ export const Assistant = () => {
       }
     } catch (err) {
       console.error(err);
+      sounds.error();
       toast.error("Failed to get response from Nova");
       addLog('system', "Error: Failed to connect to Gemini API.", 'System');
     }
@@ -512,6 +583,7 @@ export const Assistant = () => {
             size="icon" 
             onClick={() => setIsMenuOpen(true)}
             className="rounded-full hover:bg-white/5"
+            aria-label="Open menu"
           >
             <Menu className="w-5 h-5 text-white/60" />
           </Button>
@@ -1233,7 +1305,8 @@ export const Assistant = () => {
       {isCameraOpen && (
         <Camera 
           onCapture={handleCapture} 
-          onClose={() => setIsCameraOpen(false)} 
+          onClose={() => setIsCameraOpen(false)}
+          showAR={showAR}
         />
       )}
       

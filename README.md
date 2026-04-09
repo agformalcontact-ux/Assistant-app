@@ -36,13 +36,119 @@ Nova is a highly capable, proactive, and emotionally intelligent AI assistant fo
 - **Ambient Soundscapes**: Immersive audio environments to enhance your focus or relaxation.
 
 ## 🛠️ Technical Overview
-- **Frontend**: React, Tailwind CSS, Framer Motion.
-- **Backend**: Firebase (Auth, Firestore).
+- **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion.
+- **Backend**: Firebase (Auth, Firestore), Express API proxy.
 - **AI**: Google Gemini API (Live API, Generative AI).
 - **Audio**: Web Audio API for real-time PCM processing.
+- **Testing**: Vitest, React Testing Library.
+- **Code Quality**: ESLint, TypeScript.
 
 ## 📱 Getting Started
-1. **Sign Up/Login**: Use your Google account or email to create a profile.
-2. **Grant Permissions**: Allow access to your microphone and camera for full functionality.
-3. **Start Talking**: Click the Nova icon to begin your live session.
-4. **Explore Settings**: Customize Nova's voice, model, and visual style in the settings menu.
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd Assistant-app
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your API keys
+```
+
+### Development
+```bash
+# Start the API proxy server
+npm run server
+
+# Start the development server (in another terminal)
+npm run dev
+
+# Or run both together
+npm run dev:full
+```
+
+### Testing
+```bash
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+```
+
+### Building
+```bash
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+- `GEMINI_API_KEY`: Your Google Gemini API key (required)
+- `PORT`: API server port (default: 3001)
+- `FRONTEND_URL`: Frontend URL for CORS (default: http://localhost:3000)
+
+### Permissions Required
+- Microphone access for voice interaction
+- Camera access for visual features
+- Geolocation for travel features
+- Screen wake lock for continuous operation
+
+## 🏗️ Project Structure
+```
+src/
+├── components/          # React components
+│   ├── ui/             # Reusable UI components
+│   ├── Assistant.tsx   # Main assistant component
+│   ├── Auth.tsx        # Authentication
+│   ├── Camera.tsx      # Camera interface
+│   └── ...
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities and services
+│   ├── firebase.ts     # Firebase configuration
+│   ├── gemini.ts       # Gemini AI integration
+│   ├── memory.ts       # User memory management
+│   └── sounds.ts       # Audio utilities
+├── test/               # Test files
+└── types/              # TypeScript type definitions
+
+public/
+├── icons/              # PWA icons
+├── manifest.json       # PWA manifest
+└── sw.js              # Service worker
+
+server.js               # API proxy server
+```
+
+## 🔒 Security
+- API keys are proxied through a backend server to prevent client-side exposure
+- Firebase security rules protect user data
+- HTTPS required for production deployment
+
+## 📈 Performance
+- Code splitting reduces initial bundle size
+- Lazy loading for components
+- Optimized service worker caching
+- Manual chunking for better loading
+
+## 🤝 Contributing
+1. Fork the repository
+2. Create a feature branch
+3. Run tests: `npm test`
+4. Run linting: `npm run lint:js`
+5. Submit a pull request
+
+## 📄 License
+This project is licensed under the MIT License.
