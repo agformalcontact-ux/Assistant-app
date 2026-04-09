@@ -1,8 +1,6 @@
 {
   "functions": {
-    "api/gemini.js": {
-      "runtime": "nodejs18.x"
-    }
+    "api/gemini.js": {}
   },
   "rewrites": [
     {
