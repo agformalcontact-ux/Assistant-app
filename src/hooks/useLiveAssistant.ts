@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { connectLive } from '@/lib/gemini';
-import { LiveServerMessage } from '@google/genai';
+import type { LiveServerMessage } from '@google/genai';
 
 export const useLiveAssistant = (voice: string = "Puck", accent: string = "Standard", facts: string[] = [], model: string = "gemini-3.1-flash-live-preview") => {
   const [isActive, setIsActive] = useState(false);
@@ -93,6 +92,7 @@ export const useLiveAssistant = (voice: string = "Puck", accent: string = "Stand
       // For production, use AudioWorklet
       processorRef.current = audioContextRef.current.createScriptProcessor(4096, 1, 1);
       
+      const { connectLive } = await import('@/lib/gemini');
       const sessionPromise = connectLive({
         onopen: () => {
           setIsActive(true);

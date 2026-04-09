@@ -1,5 +1,5 @@
-import { GoogleGenAI, Type, FunctionDeclaration, Modality } from "@google/genai";
 import { memoryService } from "./memory";
+import type { FunctionDeclaration } from "@google/genai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -7,9 +7,11 @@ if (!apiKey) {
   console.warn("GEMINI_API_KEY is not set. AI features will be disabled.");
 }
 
-const ai = new GoogleGenAI({ apiKey: apiKey || "" });
+const getTools = async (): Promise<FunctionDeclaration[]> => {
+  const { Type } = await import("@google/genai");
 
-export const tools: FunctionDeclaration[] = [
+  return [
+
   // ... existing tools ...
   {
     name: "start_routine",
@@ -276,10 +278,15 @@ export const tools: FunctionDeclaration[] = [
       required: ["query"]
     }
   }
-];
+  ];
+};
 
-export const connectLive = (callbacks: any, voice: string = "Puck", accent: string = "Standard", facts: string[] = [], model: string = "gemini-3.1-flash-live-preview") => {
+export const connectLive = async (callbacks: any, voice: string = "Puck", accent: string = "Standard", facts: string[] = [], model: string = "gemini-3.1-flash-live-preview") => {
   if (!apiKey) throw new Error("API Key missing");
+
+  const { GoogleGenAI, Modality } = await import("@google/genai");
+  const ai = new GoogleGenAI({ apiKey: apiKey || "" });
+  const tools = await getTools();
 
   return ai.live.connect({
     model: model,
@@ -325,6 +332,10 @@ export const connectLive = (callbacks: any, voice: string = "Puck", accent: stri
 
 export const getGeminiResponse = async (prompt: string, history: any[] = [], imageBase64?: string) => {
   if (!apiKey) return { text: "AI is currently unavailable. Please check your API key.", functionCalls: null };
+
+  const { GoogleGenAI } = await import("@google/genai");
+  const ai = new GoogleGenAI({ apiKey: apiKey || "" });
+  const tools = await getTools();
 
   try {
     const parts: any[] = [{ text: prompt }];

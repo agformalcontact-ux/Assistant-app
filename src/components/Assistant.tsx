@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Brain, Dumbbell, Receipt, Languages, Shield, Edit3, AlertTriangle, MapPin, Mic, MicOff, MessageSquare, Settings, Bell, Send, Volume2, Download, Sparkles, ChevronRight, Camera as CameraIcon, X, Zap, HelpCircle, Menu, History } from 'lucide-react';
 import { useLiveAssistant } from '@/hooks/useLiveAssistant';
 import { VoiceVisualizer } from './VoiceVisualizer';
