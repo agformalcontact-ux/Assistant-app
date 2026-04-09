@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/gemini.js": {
+      "runtime": "@vercel/node@2.1.0"
+    }
+  },
   "headers": [
     {
       "source": "/api/(.*)",
