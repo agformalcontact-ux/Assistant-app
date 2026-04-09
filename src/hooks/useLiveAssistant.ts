@@ -63,6 +63,13 @@ export const useLiveAssistant = (voice: string = "Puck", accent: string = "Stand
   }, []);
 
   const start = useCallback(async (onToolCall?: (name: string, args: any) => Promise<any> | any) => {
+    // Check if we're in a serverless environment (Vercel)
+    if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+      setError("Live voice mode is not available in this deployment. Please use text mode.");
+      setIsConnecting(false);
+      return;
+    }
+
     if (!window.AudioContext && !(window as any).webkitAudioContext) {
       setError("AudioContext is not supported in this browser.");
       return;

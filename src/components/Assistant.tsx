@@ -436,37 +436,41 @@ export const Assistant = () => {
   const handleTextSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!textInput.trim()) return;
-    
+
     const input = textInput;
     setTextInput("");
     addLog('user', input, 'Chat');
-    
+
     try {
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash-exp",
-        systemInstruction: `You are Nova, a proactive and emotionally intelligent AI assistant. 
-        You are currently in text mode. Be concise and helpful. 
-        You have access to the user's memories and facts: ${facts.join(', ')}.
-        The user's name is ${user?.displayName || 'User'}.`,
-        tools: [{ googleSearch: {} }] as any
+      const history = logs
+        .filter(l => l.category === 'Chat' && (l.type === 'user' || l.type === 'assistant'))
+        .map(l => ({
+          role: l.type === 'user' ? 'user' : 'model',
+          parts: [{ text: l.content }]
+        }));
+
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: input,
+          history,
+          systemInstruction: `You are Nova, a proactive and emotionally intelligent AI assistant.
+          You are currently in text mode. Be concise and helpful.
+          You have access to the user's memories and facts: ${facts.join(', ')}.
+          The user's name is ${user?.displayName || 'User'}.`
+        }),
       });
 
-      if (!chatSessionRef.current) {
-        chatSessionRef.current = model.startChat({
-          history: logs
-            .filter(l => l.category === 'Chat' && (l.type === 'user' || l.type === 'assistant'))
-            .map(l => ({
-              role: l.type === 'user' ? 'user' : 'model',
-              parts: [{ text: l.content }]
-            }))
-        });
+      if (!response.ok) {
+        throw new Error('Failed to get response');
       }
-      
-      const result = await chatSessionRef.current.sendMessage(input);
-      const response = await result.response;
-      const text = response.text();
-      
+
+      const data = await response.json();
+      const text = data.text;
+
       if (text) {
         addLog('assistant', text, 'Chat');
       }
