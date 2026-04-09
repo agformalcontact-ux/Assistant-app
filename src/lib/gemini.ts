@@ -1,7 +1,7 @@
 import { memoryService } from "./memory";
 import type { FunctionDeclaration } from "@google/genai";
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
   console.warn("GEMINI_API_KEY is not set. AI features will be disabled.");
