@@ -34,6 +34,14 @@ const GEMINI_MODELS = [
   'gemini-2.0-flash-exp',
   'gemini-2.0-flash-preview'
 ];
+const OTHER_MODELS = [
+  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'Anthropic' },
+  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', provider: 'Anthropic' },
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI' },
+  { id: 'perplexity-sonar', name: 'Perplexity Sonar', provider: 'Perplexity' },
+  { id: 'perplexity-r1', name: 'Perplexity R1', provider: 'Perplexity' }
+];
 const VISUAL_STYLES = ['Minimalist', 'Cyberpunk', 'Nebula', 'Dark', 'Evil'];
 const ACCENTS = ['Standard', 'Irish', 'British', 'Australian', 'Southern'];
 const PERSONALITIES = ['Helpful', 'Sarcastic', 'Professional', 'Playful'];
@@ -124,23 +132,47 @@ export const SettingsPage = ({ onClose, user, currentSettings, updateSetting, on
 
               <section className="space-y-4">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-white/40">
-                  Gemini Model
+                  AI Model
                 </h3>
-                <div className="space-y-2">
-                  {GEMINI_MODELS.map((m) => (
-                    <button
-                      key={m}
-                      onClick={() => updateSetting('selectedModel', m)}
-                      className={`w-full px-4 py-3 rounded-xl text-xs border transition-all flex items-center justify-between ${
-                        currentSettings.selectedModel === m
-                          ? 'bg-blue-600/20 border-blue-500/50 text-blue-400'
-                          : 'bg-white/5 border-white/5 hover:bg-white/10 text-white/60'
-                      }`}
-                    >
-                      {m}
-                      {currentSettings.selectedModel === m && <Check className="w-4 h-4" />}
-                    </button>
-                  ))}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-white/60">Google Gemini</h4>
+                    {GEMINI_MODELS.map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => updateSetting('selectedModel', m)}
+                        className={`w-full px-4 py-3 rounded-xl text-xs border transition-all flex items-center justify-between ${
+                          currentSettings.selectedModel === m
+                            ? 'bg-blue-600/20 border-blue-500/50 text-blue-400'
+                            : 'bg-white/5 border-white/5 hover:bg-white/10 text-white/60'
+                        }`}
+                      >
+                        {m}
+                        {currentSettings.selectedModel === m && <Check className="w-4 h-4" />}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-semibold text-white/60">Other Providers</h4>
+                    {OTHER_MODELS.map((model) => (
+                      <button
+                        key={model.id}
+                        onClick={() => updateSetting('selectedModel', model.id)}
+                        className={`w-full px-4 py-3 rounded-xl text-xs border transition-all flex items-center justify-between ${
+                          currentSettings.selectedModel === model.id
+                            ? 'bg-blue-600/20 border-blue-500/50 text-blue-400'
+                            : 'bg-white/5 border-white/5 hover:bg-white/10 text-white/60'
+                        }`}
+                      >
+                        <div className="flex flex-col items-start">
+                          <span>{model.name}</span>
+                          <span className="text-[10px] text-white/40">{model.provider}</span>
+                        </div>
+                        {currentSettings.selectedModel === model.id && <Check className="w-4 h-4" />}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </section>
 

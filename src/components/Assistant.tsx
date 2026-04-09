@@ -448,19 +448,46 @@ const Assistant = () => {
           parts: [{ text: l.content }]
         }));
 
-      const response = await fetch('/api/gemini', {
+      // Determine API endpoint based on selected model
+      let apiEndpoint = '/api/gemini';
+      let requestBody: any = {
+        prompt: input,
+        history,
+        systemInstruction: `You are Nova, a proactive and emotionally intelligent AI assistant.
+        You are currently in text mode. Be concise and helpful.
+        You have access to the user's memories and facts: ${facts.join(', ')}.
+        The user's name is ${user?.displayName || 'User'}.`
+      };
+
+      if (selectedModel.startsWith('claude-')) {
+        apiEndpoint = '/api/claude';
+        requestBody = {
+          prompt: input,
+          model: selectedModel === 'claude-3-5-sonnet' ? 'claude-3-5-sonnet-20241022' : 'claude-3-haiku-20240307'
+        };
+      } else if (selectedModel.startsWith('gpt-')) {
+        apiEndpoint = '/api/openai';
+        requestBody = {
+          prompt: input,
+          model: selectedModel === 'gpt-4o' ? 'gpt-4o' : 'gpt-4o-mini'
+        };
+      } else if (selectedModel.startsWith('perplexity-')) {
+        apiEndpoint = '/api/perplexity';
+        requestBody = {
+          prompt: input,
+          model: selectedModel === 'perplexity-sonar' ? 'sonar' : 'r1-70b-chat'
+        };
+      } else {
+        // Gemini models
+        requestBody.model = selectedModel;
+      }
+
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          prompt: input,
-          history,
-          systemInstruction: `You are Nova, a proactive and emotionally intelligent AI assistant.
-          You are currently in text mode. Be concise and helpful.
-          You have access to the user's memories and facts: ${facts.join(', ')}.
-          The user's name is ${user?.displayName || 'User'}.`
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -477,7 +504,7 @@ const Assistant = () => {
       console.error(err);
       sounds.error();
       toast.error("Failed to get response from Nova");
-      addLog('system', "Error: Failed to connect to Gemini API.", 'System');
+      addLog('system', `Error: Failed to connect to ${selectedModel} API.`, 'System');
     }
   };
 

@@ -2,6 +2,15 @@
   "functions": {
     "api/gemini.js": {
       "runtime": "@vercel/node@3.1.0"
+    },
+    "api/claude.js": {
+      "runtime": "@vercel/node@3.1.0"
+    },
+    "api/openai.js": {
+      "runtime": "@vercel/node@3.1.0"
+    },
+    "api/perplexity.js": {
+      "runtime": "@vercel/node@3.1.0"
     }
   },
   "headers": [
