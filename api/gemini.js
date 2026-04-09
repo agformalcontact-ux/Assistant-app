@@ -29,11 +29,34 @@ export default async function handler(req, res) {
       });
     }
 
+    // Build conversation history
+    const contents = [];
+    
+    // Add system instruction if provided
+    if (systemInstruction) {
+      contents.push({
+        role: 'user',
+        parts: [{ text: systemInstruction }]
+      });
+      contents.push({
+        role: 'model',
+        parts: [{ text: 'I understand my role and will follow these instructions.' }]
+      });
+    }
+
+    // Add conversation history
+    history.forEach(item => {
+      contents.push(item);
+    });
+
+    // Add current user message
+    contents.push({
+      role: 'user',
+      parts
+    });
+
     const result = await model.generateContent({
-      contents: [
-        ...history,
-        { role: 'user', parts }
-      ]
+      contents
     });
 
     const response = await result.response;
